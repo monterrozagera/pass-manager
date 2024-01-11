@@ -1,7 +1,7 @@
 import sqlite3
 
 class Database():
-    def init(self, path):
+    def __init__(self):
         try:
             with open("pass.db", 'r') as db:
                 pass

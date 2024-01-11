@@ -1,5 +1,6 @@
 from cryptography.fernet import Fernet
-import pass_db
+import pass_db as db
+
 
 
 class Manager():
@@ -10,10 +11,12 @@ class Manager():
 
         # make Fernet object for encryption/decryption
         self.f = Fernet(self.key)
+        self.pass_db = db.Database()
+        
 
     def return_all_passwords(self) -> dict:
         # returns a dict with all decrypted passwords
-        pass_list = pass_db.return_all_records(self.user)
+        pass_list = self.pass_db.return_all_records(self.user)
         all_values = {}
 
         if pass_list:
@@ -23,16 +26,16 @@ class Manager():
         return all_values
     
     def delete_all_passwords(self):
-        pass_db.delete_all(self.user)
+        self.pass_db.delete_all(self.user)
 
     def delete_from_db(self, id: int):
-        pass_db.delete_from_database(id)
+        self.pass_db.delete_from_database(id)
 
     def create_user(self):
-        pass_db.create_user(self.user, self.key)
+        self.pass_db.create_user(self.user, self.key)
 
     def print_all_passwords(self):
-        pass_list = pass_db.return_all_records(self.user)
+        pass_list = self.pass_db.return_all_records(self.user)
 
         if pass_list:
             for value in pass_list:
@@ -41,7 +44,7 @@ class Manager():
                 print(f"\tPassword: {self.f.decrypt(value[2]).decode()}")
 
     def save_to_database(self, user, password):
-        pass_db.add_to_database(pass_db.check_current_index() + 1, self.user, pass_db.check_current_pass_index(self.user) + 1, self.f.encrypt(bytes(user, 'utf-8')).decode(), self.f.encrypt(bytes(password, 'utf-8')).decode())
+        self.pass_db.add_to_database(self.pass_db.check_current_index() + 1, self.user, self.pass_db.check_current_pass_index(self.user) + 1, self.f.encrypt(bytes(user, 'utf-8')).decode(), self.f.encrypt(bytes(password, 'utf-8')).decode())
 
     def update_record(self, index, user, password):
-        pass_db.update_database(index, self.user, self.f.encrypt(bytes(user, 'utf-8')).decode(), self.f.encrypt(bytes(password, 'utf-8')).decode())
+        self.pass_db.update_database(index, self.user, self.f.encrypt(bytes(user, 'utf-8')).decode(), self.f.encrypt(bytes(password, 'utf-8')).decode())

@@ -1,5 +1,4 @@
 from cryptography.fernet import Fernet
-import pass_db
 import argparse
 import manager
 
@@ -34,7 +33,7 @@ if __name__ == "__main__":
         KEY = key_file.read()
     
     Pass_Manager = manager.Manager(USER, KEY)
-
+    
     while True:
         try:
             choice = input(">")
@@ -68,11 +67,11 @@ if __name__ == "__main__":
                             Pass_Manager.update_record(int(index), name, password)
 
                     case 6:
-                        pass_db.close_db()
+                        Pass_Manager.pass_db.close_db()
                         exit()
 
                     case 99:
                         print(Pass_Manager.return_all_passwords())
         except KeyboardInterrupt:
-            pass_db.close_db()
+            Pass_Manager.pass_db.close_db()
             exit()
