@@ -1,4 +1,5 @@
 from cryptography.fernet import Fernet
+import hashlib
 import pass_db as db
 
 
@@ -11,8 +12,9 @@ class Manager():
 
         # make Fernet object for encryption/decryption
         self.f = Fernet(self.key)
-        self.pass_db = db.Database()
-        
+        self.pass_db = db.Database(self.user, hashlib.md5(self.key.encode('utf-8')).hexdigest())
+
+        self.login_user()
 
     def return_all_passwords(self) -> dict:
         # returns a dict with all decrypted passwords
@@ -29,10 +31,14 @@ class Manager():
         self.pass_db.delete_all(self.user)
 
     def delete_from_db(self, id: int):
-        self.pass_db.delete_from_database(id)
+        self.pass_db.delete_from_database(self.user, id)
 
     def create_user(self):
-        self.pass_db.create_user(self.user, self.key)
+        self.pass_db.create_user(self.user, hashlib.md5(self.key.encode('utf-8')).hexdigest())
+
+    def login_user(self):
+        if self.pass_db.user_login_check():
+            print("[!] LOGIN OK [!]")
 
     def print_all_passwords(self):
         pass_list = self.pass_db.return_all_records(self.user)
